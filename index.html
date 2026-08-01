@@ -91,6 +91,7 @@ function playPath(label, foldset){
 
 fetch('./folds.json').then(r=>r.json()).then(({folds:F})=>{
   folds = F;
+  document.getElementById('count').textContent = F.length.toLocaleString() + ' public repos — the whole public estate sings';
   const withPitch = F.map(f=>({ f, p: pitch(f) }));
   const g = document.getElementById('grid');
   g.innerHTML = withPitch.map(({f,p},i)=>`<div class="fold" data-i="${i}"><div class="n">${f.name}</div><div class="p">${NOTE(p.midi)} · ${p.hz.toFixed(0)}Hz</div><div class="c">chamber ${p.chamber}</div></div>`).join('');
