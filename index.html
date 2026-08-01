@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THE MESH SINGS · hear the estate</title>
+<meta name="description" content="Every fold-signature gets a stable musical pitch (number = note). Similar folds sound similar; a path that holds resolves as music, a broken one clashes. WebAudio, browser-only.">
+<style>
+  :root{ --bg:#0a0a0a; --panel:#141414; --panel2:#1a1a18; --border:#242424; --ink:#e8e6e3; --dim:#8a8478;
+    --gold:#d4a017; --amber:#e8a012; --green:#6b9a72; --serif:'Playfair Display',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:ui-monospace,'DM Mono',monospace; }
+  @media (prefers-color-scheme:light){ :root{ --bg:#f6f4ee; --panel:#fff; --panel2:#f0ece2; --border:#e0dccf; --ink:#1a1712; --dim:#8a8478; } }
+  :root[data-theme=dark]{ --bg:#0a0a0a; --panel:#141414; --panel2:#1a1a18; --border:#242424; --ink:#e8e6e3; }
+  :root[data-theme=light]{ --bg:#f6f4ee; --panel:#fff; --panel2:#f0ece2; --border:#e0dccf; --ink:#1a1712; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;min-height:100dvh;padding:24px 18px 60px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{text-align:center;margin:10px 0 26px}
+  .mark{font-family:var(--serif);font-weight:800;color:var(--gold);font-size:38px;line-height:1}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,5vw,40px);margin:10px 0 6px;letter-spacing:-.02em}
+  h1 em{color:var(--gold);font-style:italic}
+  .sub{color:var(--dim);max-width:560px;margin:0 auto;font-size:14.5px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:24px 0 10px}
+  button{font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:.02em;padding:12px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--ink);cursor:pointer;transition:.15s}
+  button:hover{border-color:var(--gold);color:var(--gold)}
+  button.gold{background:var(--gold);color:#0a0a0a;border-color:var(--gold)}
+  button.gold:hover{background:var(--amber);color:#0a0a0a}
+  .meter{max-width:560px;margin:14px auto 0;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel);font-family:var(--mono);font-size:13px;color:var(--dim);text-align:center;min-height:52px}
+  .meter b{color:var(--gold)} .meter .holds{color:var(--green)} .meter .broken{color:#cc6a5a}
+  .bar{height:8px;border-radius:8px;background:var(--panel2);margin-top:10px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,#cc6a5a,var(--gold),var(--green));transition:width .4s}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:26px}
+  .fold{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 14px;cursor:pointer;transition:.12s;text-align:left}
+  .fold:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .fold.ring{border-color:var(--gold);box-shadow:0 0 18px rgba(212,160,23,.35)}
+  .fold .n{font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink);word-break:break-word}
+  .fold .p{font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:5px}
+  .fold .c{font-family:var(--mono);font-size:10px;color:var(--dim)}
+  footer{text-align:center;color:var(--dim);font-family:var(--mono);font-size:11px;margin-top:34px;line-height:1.7}
+  footer a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">◊</div>
+    <h1>The mesh <em>sings</em>.</h1>
+    <p class="sub">Every fold-signature gets one stable pentatonic note — number = sound. Click a fold to hear its voice. Play a path and hear whether it <em>holds</em>: a coherent traversal resolves as music, a broken one piles into noise.</p>
+  </header>
+
+  <div class="controls">
+    <button class="gold" id="estate">▶ Play the estate</button>
+    <button id="coherent">▶ A path that holds</button>
+    <button id="broken">▶ A broken path</button>
+    <button id="theme" title="Toggle theme">◐</button>
+  </div>
+  <div class="meter" id="meter">Tap a control or a fold — WebAudio starts on your first click.</div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    number → note via a deterministic signature · register from fall-remember's chamber (similar folds share a register) · κ = 0.618 sets the sound-to-silence ratio<br>
+    27 public folds · zero private data · <a href="https://github.com/sjgant80-hub/mesh-sings">source</a>
+  </footer>
+</div>
+
+<script type="module">
+import { pitch, path, KAPPA } from './sonify.mjs';
+
+const NOTE = m => ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'][m%12] + (Math.floor(m/12)-1);
+let AC, folds = [];
+function ac(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
+function tone(hz, when=0, dur=0.42, gain=0.16){
+  const c=ac(), o=c.createOscillator(), g=c.createGain(), t=c.currentTime+when;
+  o.type='triangle'; o.frequency.value=hz;
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(gain,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+0.05);
+}
+const meter = document.getElementById('meter');
+
+function showPath(label, r){
+  const pct = Math.round(r.coherence*100);
+  meter.innerHTML = `${label} — coherence <b>${r.coherence.toFixed(2)}</b> · ${r.holds?'<span class="holds">HOLDS → music (κ-spaced rest)</span>':'<span class="broken">BROKEN → piled into noise</span>'}<div class="bar"><i style="width:${pct}%"></i></div>`;
+}
+function playPath(label, foldset){
+  const r = path(foldset);
+  if(r.holds){ const step=0.34, rest=step*(r.restRatio/0.382); r.notes.forEach((n,i)=>{ tone(n.hz, i*(step+rest), step*0.95); }); }
+  else { r.notes.forEach(n=> tone(n.hz, Math.random()*0.05, 1.4, 0.09)); }   // all at once = cluster/noise
+  showPath(label, r);
+}
+
+fetch('./folds.json').then(r=>r.json()).then(({folds:F})=>{
+  folds = F;
+  const withPitch = F.map(f=>({ f, p: pitch(f) }));
+  const g = document.getElementById('grid');
+  g.innerHTML = withPitch.map(({f,p},i)=>`<div class="fold" data-i="${i}"><div class="n">${f.name}</div><div class="p">${NOTE(p.midi)} · ${p.hz.toFixed(0)}Hz</div><div class="c">chamber ${p.chamber}</div></div>`).join('');
+  g.querySelectorAll('.fold').forEach(el=>el.onclick=()=>{ const {f,p}=withPitch[+el.dataset.i]; tone(p.hz); el.classList.add('ring'); setTimeout(()=>el.classList.remove('ring'),450); meter.innerHTML=`<b>${f.name}</b> → ${NOTE(p.midi)} (${p.hz.toFixed(1)}Hz) · chamber ${p.chamber} · sig ${p.sig}`; });
+
+  document.getElementById('estate').onclick=()=>{ // ascending sorted = the estate as one intelligible run
+    const sorted=[...withPitch].sort((a,b)=>a.p.midi-b.p.midi).map(x=>x.f);
+    playPath('the whole estate (sorted)', sorted);
+  };
+  document.getElementById('coherent').onclick=()=>{ // a smooth family walk
+    const fam=['deepgram-mcp','deepgram-api','deepgram-sdk','elevenlabs-mcp','elevenlabs-api'].map(n=>F.find(f=>f.name===n)).filter(Boolean);
+    playPath('a family path', fam.sort((a,b)=>pitch(a).midi-pitch(b).midi));
+  };
+  document.getElementById('broken').onclick=()=>{ // max-jump scatter across chambers
+    const s=[...withPitch].sort((a,b)=>a.p.midi-b.p.midi), out=[];
+    for(let i=0;i<Math.floor(s.length/2);i++){ out.push(s[i].f); out.push(s[s.length-1-i].f); }   // interleave extremes = big jumps
+    playPath('a scattered path', out.slice(0,7));
+  };
+});
+
+// theme toggle
+const root=document.documentElement;
+document.getElementById('theme').onclick=()=>{ const cur=root.getAttribute('data-theme')|| (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'); root.setAttribute('data-theme', cur==='dark'?'light':'dark'); };
+</script>
+</body>
+</html>

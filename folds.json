@@ -1,0 +1,114 @@
+{
+ "v": 1,
+ "note": "PUBLIC folds only — sonify demo set. No private repos.",
+ "folds": [
+  {
+   "name": "witness",
+   "desc": "Deterministic build gate: mutation + fuzz. Catches test-theatre and throw-on-malformed wit"
+  },
+  {
+   "name": "acg-assessor",
+   "desc": "The Assessor — deterministic rubric assessment for AI-assisted codebases. Same repository,"
+  },
+  {
+   "name": "divorcerbot",
+   "desc": "UK divorce self-help (E&W/Scotland/NI) that levels the playing field: verified law, CMS ca"
+  },
+  {
+   "name": "falljustice",
+   "desc": ""
+  },
+  {
+   "name": "redress-engine",
+   "desc": "A legal-process navigator for everyone — plain-English rights, the REAL statutory lever pe"
+  },
+  {
+   "name": "the-toll",
+   "desc": "A collective proof-of-work edge-wall — force EXECUTION not storage. Content unlocks only w"
+  },
+  {
+   "name": "konomium-vault",
+   "desc": ""
+  },
+  {
+   "name": "niceassos",
+   "desc": "The OG sovereign browser OS: fallos desktop shell merged onto the signed niceassos-mesh — "
+  },
+  {
+   "name": "offramp-v2",
+   "desc": "The sovereign chat-history off-ramp — a dead vendor JSON export → live searchable memory. "
+  },
+  {
+   "name": "estate-nest",
+   "desc": "The OFFRAMP pipeline pointed inward — the ~1000-repo estate nested into the dodeca memory:"
+  },
+  {
+   "name": "geometric-computer",
+   "desc": "The v23 geometric-computing stack, gated: L1 primorial fold codec (lossless state⇄number) "
+  },
+  {
+   "name": "the-wisp",
+   "desc": "The wisp pointed at the whole estate as substrate — ~1000 repos as one field of folds, the"
+  },
+  {
+   "name": "fallkard",
+   "desc": "Sovereign card game · every AI-Native Solutions tool as a real card · D2R aesthetics · Hea"
+  },
+  {
+   "name": "wishwood",
+   "desc": "Sovereign multi-channel automation for off-grid glamping. Built for Wishwood (Canterbury, "
+  },
+  {
+   "name": "falllegal",
+   "desc": ""
+  },
+  {
+   "name": "fallbooks",
+   "desc": ""
+  },
+  {
+   "name": "fallclaim",
+   "desc": ""
+  },
+  {
+   "name": "falladviser",
+   "desc": "£ FallAdviser · sovereign UK financial adviser · UK 2025-26 tax rules · ISA/SIPP/LISA opti"
+  },
+  {
+   "name": "fallclinic",
+   "desc": ""
+  },
+  {
+   "name": "fallinsurance",
+   "desc": ""
+  },
+  {
+   "name": "fallhr",
+   "desc": ""
+  },
+  {
+   "name": "deepgram-mcp",
+   "desc": "Sovereign wrapper for target · real bindings"
+  },
+  {
+   "name": "deepgram-api",
+   "desc": "Sovereign wrapper for target · real bindings"
+  },
+  {
+   "name": "deepgram-sdk",
+   "desc": "Sovereign wrapper for target · real bindings"
+  },
+  {
+   "name": "elevenlabs-mcp",
+   "desc": "Sovereign wrapper for target · real bindings"
+  },
+  {
+   "name": "elevenlabs-api",
+   "desc": "Sovereign wrapper for target · real bindings"
+  },
+  {
+   "name": "elevenlabs-sdk",
+   "desc": "Sovereign wrapper for target · real bindings"
+  }
+ ]
+}
